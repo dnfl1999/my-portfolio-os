@@ -1,0 +1,519 @@
+:root {
+  font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+  color: #0f172a;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light;
+  --bg-card: rgba(255, 255, 255, 0.86);
+  --border: rgba(148, 163, 184, 0.24);
+  --primary: #2563eb;
+  --primary-soft: #dbeafe;
+  --danger: #dc2626;
+  --text-subtle: #475569;
+  --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar-panel {
+  border-right: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(20px);
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.brand-card,
+.card,
+.metric-card {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+.brand-card {
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.brand-card h2 {
+  margin: 10px 0 8px;
+  font-size: 1.5rem;
+}
+
+.brand-card p,
+.page-subtitle,
+.card-header p,
+.section-title p,
+.metric-card small,
+.note-content p,
+.cell-subtitle,
+.empty-state p,
+.target-row p {
+  color: var(--text-subtle);
+}
+
+.brand-badge,
+.eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.nav-list {
+  display: grid;
+  gap: 10px;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: transparent;
+  padding: 16px;
+  text-align: left;
+  color: inherit;
+}
+
+.nav-item.active {
+  border-color: rgba(37, 99, 235, 0.18);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.nav-item span {
+  color: var(--text-subtle);
+  font-size: 0.92rem;
+}
+
+.main-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.page-header {
+  padding: 28px 32px 0;
+}
+
+.page-header h1 {
+  margin: 14px 0 8px;
+  font-size: clamp(1.8rem, 2vw, 2.6rem);
+}
+
+.page-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px 32px 96px;
+}
+
+.page-grid,
+.allocation-targets,
+.settings-actions,
+.list-table,
+.allocation-list,
+.note-content,
+.settings-summary {
+  display: grid;
+  gap: 24px;
+}
+
+.section-title h2,
+.card-header h3 {
+  margin: 0;
+}
+
+.metrics-grid,
+.dashboard-grid,
+.notes-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.metrics-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.dashboard-grid,
+.notes-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metric-card,
+.card {
+  border-radius: 24px;
+  padding: 22px;
+}
+
+.metric-card {
+  display: grid;
+  gap: 10px;
+}
+
+.metric-card span {
+  color: var(--text-subtle);
+  font-size: 0.92rem;
+}
+
+.metric-card strong {
+  font-size: 1.5rem;
+}
+
+.positive,
+.metric-card.positive strong {
+  color: #15803d;
+}
+
+.negative,
+.metric-card.negative strong {
+  color: var(--danger);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  padding: 10px 14px;
+  transition: 0.2s ease;
+}
+
+.button.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.button.secondary {
+  background: #0f766e;
+  color: white;
+}
+
+.button.ghost {
+  border-color: var(--border);
+  background: white;
+  color: inherit;
+}
+
+.button.danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.button.small {
+  padding: 7px 10px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.form-grid.compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.form-grid label {
+  display: grid;
+  gap: 8px;
+  color: var(--text-subtle);
+  font-size: 0.92rem;
+}
+
+.form-grid input,
+.form-grid textarea,
+.form-grid select,
+.target-row input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px 14px;
+}
+
+.full-span {
+  grid-column: 1 / -1;
+}
+
+.form-actions,
+.table-actions,
+.allocation-row,
+.legend-item,
+.list-row,
+.target-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.form-actions,
+.table-actions {
+  justify-content: flex-end;
+}
+
+.allocation-row,
+.legend-item,
+.list-row,
+.target-row {
+  justify-content: space-between;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  padding: 14px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: var(--text-subtle);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-weight: 600;
+}
+
+.sort-button.active {
+  color: var(--primary);
+}
+
+.list-row {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  padding: 14px 16px;
+}
+
+.donut-chart-wrap {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.donut-chart {
+  width: 100%;
+  max-width: 220px;
+}
+
+.donut-center-label {
+  fill: #64748b;
+  font-size: 8px;
+}
+
+.donut-center-value {
+  fill: #0f172a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.allocation-item {
+  display: grid;
+  gap: 8px;
+}
+
+.allocation-row.compact {
+  color: var(--text-subtle);
+  font-size: 0.92rem;
+}
+
+.allocation-bar {
+  overflow: hidden;
+  height: 10px;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.allocation-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2563eb 0%, #0ea5e9 100%);
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.loading-card {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  text-align: center;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.file-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.file-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.mobile-tabs-wrapper {
+  display: none;
+}
+
+.mobile-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-top: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+}
+
+.mobile-tabs button {
+  border: none;
+  background: transparent;
+  padding: 14px 8px;
+  color: var(--text-subtle);
+}
+
+.mobile-tabs button.active {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+@media (max-width: 1200px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-panel {
+    display: none;
+  }
+
+  .page-header,
+  .page-content {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .page-content {
+    padding-bottom: 110px;
+  }
+
+  .dashboard-grid,
+  .notes-grid,
+  .form-grid,
+  .form-grid.compact,
+  .settings-actions,
+  .donut-chart-wrap,
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-tabs-wrapper {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+  }
+}
