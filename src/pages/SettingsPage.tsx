@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+﻿import { ChangeEvent } from "react";
 import { Card } from "../components/common/Card";
 import { isSupabaseConfigured } from "../integrations/supabase/client";
 import { formatCurrency, formatPercent } from "../utils/formatters";
@@ -38,6 +38,10 @@ export function SettingsPage({ store }: SettingsPageProps) {
           <div className="summary-row">
             <strong>현재 사용 중인 저장소</strong>
             <span>{store.dataProvider}</span>
+          </div>
+          <div className="summary-row">
+            <strong>저장 상태</strong>
+            <span>{store.isSaving ? "저장 중" : "대기 중"}</span>
           </div>
           <div className="summary-row">
             <strong>Supabase 환경 변수</strong>

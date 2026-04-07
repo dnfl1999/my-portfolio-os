@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import {
   createPortfolioRepository,
   getDataProvider,
@@ -27,6 +27,8 @@ export function usePortfolioStore() {
   const repository = useMemo(() => createPortfolioRepository(), []);
   const [data, setData] = useState<PortfolioData>(mockPortfolioData);
   const [isReady, setIsReady] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -42,6 +44,11 @@ export function usePortfolioStore() {
       })
       .catch((error) => {
         console.error("[My Portfolio OS] 저장소 로드 실패:", error);
+        if (mounted) {
+          setSaveError(
+            error instanceof Error ? error.message : "데이터를 불러오지 못했습니다.",
+          );
+        }
       })
       .finally(() => {
         if (mounted) {
@@ -58,7 +65,22 @@ export function usePortfolioStore() {
 
   const persist = (nextData: PortfolioData) => {
     setData(nextData);
-    void repository.save(nextData);
+    setIsSaving(true);
+    setSaveError(null);
+
+    void repository
+      .save(nextData)
+      .catch((error) => {
+        console.error("[My Portfolio OS] 저장 실패:", error);
+        setSaveError(
+          error instanceof Error
+            ? error.message
+            : "데이터 저장 중 오류가 발생했습니다.",
+        );
+      })
+      .finally(() => {
+        setIsSaving(false);
+      });
   };
 
   const addHolding = (payload: Omit<Holding, "id">) => {
@@ -169,13 +191,21 @@ export function usePortfolioStore() {
   };
 
   const resetAll = () => {
-    void repository.clear();
+    setSaveError(null);
+    void repository.clear().catch((error) => {
+      console.error("[My Portfolio OS] 초기화 실패:", error);
+      setSaveError(
+        error instanceof Error ? error.message : "초기화 중 오류가 발생했습니다.",
+      );
+    });
     persist(mockPortfolioData);
   };
 
   return {
     data,
     isReady,
+    isSaving,
+    saveError,
     requestedDataProvider,
     dataProvider,
     summary,
@@ -191,5 +221,6 @@ export function usePortfolioStore() {
     exportData: handleExport,
     importData: handleImport,
     resetAll,
+    clearSaveError: () => setSaveError(null),
   };
 }

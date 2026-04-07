@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { MobileTabs } from "./components/layout/MobileTabs";
 import { Sidebar } from "./components/layout/Sidebar";
@@ -46,6 +46,27 @@ function App() {
       title={pageTitles[activePage]}
       subtitle="엑셀을 대체하는 개인 투자 대시보드"
     >
+      {store.saveError && (
+        <div className="status-banner error-banner" role="alert">
+          <div>
+            <strong>저장 오류</strong>
+            <p>{store.saveError}</p>
+          </div>
+          <button className="button ghost small" onClick={store.clearSaveError} type="button">
+            닫기
+          </button>
+        </div>
+      )}
+
+      {!store.saveError && store.isSaving && (
+        <div className="status-banner info-banner">
+          <div>
+            <strong>저장 중</strong>
+            <p>변경 사항을 {store.dataProvider} 저장소에 반영하고 있습니다.</p>
+          </div>
+        </div>
+      )}
+
       {store.isReady ? (
         renderPage()
       ) : (

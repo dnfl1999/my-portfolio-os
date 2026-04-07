@@ -421,6 +421,34 @@ th {
   text-align: center;
 }
 
+.status-banner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.status-banner p {
+  margin: 6px 0 0;
+  color: var(--text-subtle);
+}
+
+.error-banner {
+  border-color: rgba(220, 38, 38, 0.2);
+  background: #fff1f2;
+}
+
+.info-banner {
+  border-color: rgba(37, 99, 235, 0.2);
+  background: #eff6ff;
+}
+
 .loading-card {
   display: grid;
   place-items: center;

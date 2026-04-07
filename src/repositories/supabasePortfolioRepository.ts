@@ -1,9 +1,6 @@
-import { mockPortfolioData } from "../data/mockData";
+﻿import { mockPortfolioData } from "../data/mockData";
+import { getSupabaseClient, isSupabaseConfigured } from "../integrations/supabase/client";
 import { PortfolioData } from "../types";
-import {
-  getSupabaseClient,
-  isSupabaseConfigured,
-} from "../integrations/supabase/client";
 import { PortfolioRepository } from "./portfolioRepository";
 
 const TABLE_NAME = "portfolio_snapshots";
@@ -43,20 +40,52 @@ export class SupabasePortfolioRepository implements PortfolioRepository {
     }
 
     const supabase = getSupabaseClient();
-    const { error } = await supabase.from(TABLE_NAME).upsert(
-      {
-        portfolio_key: SNAPSHOT_KEY,
+    const updatedAt = new Date().toISOString();
+    const { data: updatedRows, error: updateError } = await supabase
+      .from(TABLE_NAME)
+      .update({
         payload: data,
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: "portfolio_key",
-      },
-    );
+        updated_at: updatedAt,
+      })
+      .eq("portfolio_key", SNAPSHOT_KEY)
+      .select("id")
+      .limit(1);
 
-    if (error) {
-      throw new Error(`Supabase 데이터 저장에 실패했습니다: ${error.message}`);
+    if (updateError) {
+      throw new Error(`Supabase 데이터 저장에 실패했습니다: ${updateError.message}`);
     }
+
+    if ((updatedRows?.length ?? 0) > 0) {
+      return;
+    }
+
+    const { error: insertError } = await supabase.from(TABLE_NAME).insert({
+      portfolio_key: SNAPSHOT_KEY,
+      payload: data,
+      updated_at: updatedAt,
+    });
+
+    if (!insertError) {
+      return;
+    }
+
+    if (insertError.code === "23505") {
+      const { error: retryError } = await supabase
+        .from(TABLE_NAME)
+        .update({
+          payload: data,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("portfolio_key", SNAPSHOT_KEY);
+
+      if (!retryError) {
+        return;
+      }
+
+      throw new Error(`Supabase 데이터 저장에 실패했습니다: ${retryError.message}`);
+    }
+
+    throw new Error(`Supabase 데이터 저장에 실패했습니다: ${insertError.message}`);
   }
 
   async clear(): Promise<void> {
