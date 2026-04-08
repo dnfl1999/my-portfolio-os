@@ -6,6 +6,7 @@ import {
 } from "../config/dataSource";
 import { useRef } from "react";
 import { emptyPortfolioData } from "../data/mockData";
+import { getSupabaseClient, isSupabaseConfigured } from "../integrations/supabase/client";
 import { generateMockPriceUpdates } from "../services/priceService";
 import {
   AllocationTarget,
@@ -64,6 +65,44 @@ export function usePortfolioStore() {
       mounted = false;
     };
   }, [repository]);
+
+  useEffect(() => {
+    if (dataProvider !== "supabase" || !isSupabaseConfigured()) {
+      return;
+    }
+
+    const supabase = getSupabaseClient();
+    const channel = supabase
+      .channel("portfolio-snapshots-default")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "portfolio_snapshots",
+          filter: "portfolio_key=eq.default",
+        },
+        async () => {
+          try {
+            const latest = await repository.load();
+            setData(latest);
+            setSaveError(null);
+          } catch (error) {
+            console.error("[My Portfolio OS] 실시간 동기화 실패:", error);
+            setSaveError(
+              error instanceof Error
+                ? error.message
+                : "실시간 동기화 중 오류가 발생했습니다.",
+            );
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [dataProvider, repository]);
 
   const summary = useMemo(() => calculateDashboardSummary(data), [data]);
 

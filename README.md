@@ -43,6 +43,7 @@
 - TypeScript
 - localStorage
 - Supabase-ready repository layer
+- Supabase Realtime sync
 
 ## 화면 구성
 
@@ -202,6 +203,8 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 현재 구현은 `portfolio_snapshots` 테이블의 `portfolio_key = 'default'` 행 1개를 사용해 전체 포트폴리오를 `jsonb`로 저장합니다.
 
+Realtime 자동 동기화를 쓰려면 `schema.sql`의 publication 설정까지 함께 적용해야 합니다.
+
 ### 4. 동작 방식
 
 - `load()`
@@ -211,6 +214,14 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
   - 동일 key에 대해 upsert
 - `clear()`
   - 동일 key 행 삭제
+
+## 실시간 동기화
+
+Supabase 모드에서는 `portfolio_snapshots`의 `default` 행 변경을 구독합니다.
+
+- 노트북에서 수정 후 저장
+- 모바일에서 같은 포트폴리오를 열고 있는 경우
+- 새로고침 없이도 최신 데이터가 자동 반영됩니다
 
 ### 관련 파일
 

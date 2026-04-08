@@ -8,3 +8,11 @@ create table if not exists portfolio_snapshots (
 
 create index if not exists portfolio_snapshots_portfolio_key_idx
   on portfolio_snapshots (portfolio_key);
+
+do $$
+begin
+  alter publication supabase_realtime add table portfolio_snapshots;
+exception
+  when duplicate_object then null;
+end
+$$;
