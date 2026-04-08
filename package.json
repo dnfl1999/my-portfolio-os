@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "verify:supabase": "node scripts/verify-supabase-roundtrip.mjs"
+    "verify:supabase": "node scripts/verify-supabase-roundtrip.mjs",
+    "sync:portfolio": "node scripts/sync-default-portfolio.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.102.0",
