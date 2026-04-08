@@ -21,6 +21,8 @@ const pageTitles: Record<PageKey, string> = {
 function App() {
   const [activePage, setActivePage] = useState<PageKey>("dashboard");
   const [applyUpdate, setApplyUpdate] = useState<(() => void) | null>(null);
+  const [refreshApp, setRefreshApp] = useState<(() => Promise<void>) | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const store = usePortfolioStore();
 
   useEffect(() => {
@@ -32,12 +34,35 @@ function App() {
       setApplyUpdate(() => event.detail.applyUpdate);
     };
 
+    const handleRefreshReady = (
+      event: CustomEvent<{
+        refreshApp: () => Promise<void>;
+      }>,
+    ) => {
+      setRefreshApp(() => event.detail.refreshApp);
+    };
+
     window.addEventListener("pwa-update-ready", handleUpdateReady as EventListener);
+    window.addEventListener("pwa-refresh-ready", handleRefreshReady as EventListener);
 
     return () => {
       window.removeEventListener("pwa-update-ready", handleUpdateReady as EventListener);
+      window.removeEventListener("pwa-refresh-ready", handleRefreshReady as EventListener);
     };
   }, []);
+
+  const handleRefreshClick = async () => {
+    if (!refreshApp || isRefreshing) {
+      return;
+    }
+
+    setIsRefreshing(true);
+    try {
+      await refreshApp();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const renderPage = () => {
     switch (activePage) {
@@ -63,21 +88,28 @@ function App() {
       title={pageTitles[activePage]}
       subtitle="엑셀을 대체하는 개인 투자 대시보드"
     >
-      {applyUpdate && (
-        <div className="status-banner update-banner">
-          <div>
-            <strong>새 버전이 준비되었습니다</strong>
-            <p>홈 화면 앱에서도 바로 최신 버전으로 갱신할 수 있습니다.</p>
-          </div>
+      <div className="status-banner refresh-banner">
+        <div>
+          <strong>앱 새로고침</strong>
+          <p>모바일 홈 화면 앱에서도 최신 버전과 최신 데이터를 직접 다시 불러올 수 있습니다.</p>
+        </div>
+        <div className="banner-actions">
+          {applyUpdate && (
+            <button className="button primary small" onClick={() => applyUpdate()} type="button">
+              지금 업데이트
+            </button>
+          )}
           <button
-            className="button primary small"
-            onClick={() => applyUpdate()}
+            className="button ghost small"
+            onClick={() => {
+              void handleRefreshClick();
+            }}
             type="button"
           >
-            지금 업데이트
+            {isRefreshing ? "확인 중..." : "새로고침"}
           </button>
         </div>
-      )}
+      </div>
 
       {store.saveError && (
         <div className="status-banner error-banner" role="alert">

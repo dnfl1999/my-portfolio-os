@@ -5,6 +5,7 @@ import App from "./App";
 import "./styles/index.css";
 
 let updatePending = false;
+let activeRegistration: ServiceWorkerRegistration | undefined;
 
 const updateSW = registerSW({
   immediate: true,
@@ -22,6 +23,27 @@ const updateSW = registerSW({
     );
   },
   onRegisteredSW(_swUrl, registration) {
+    activeRegistration = registration;
+
+    window.dispatchEvent(
+      new CustomEvent("pwa-refresh-ready", {
+        detail: {
+          refreshApp: async () => {
+            if (activeRegistration) {
+              await activeRegistration.update();
+            }
+
+            if (updatePending) {
+              await updateSW(true);
+              return;
+            }
+
+            window.location.reload();
+          },
+        },
+      }),
+    );
+
     if (!registration) {
       return;
     }

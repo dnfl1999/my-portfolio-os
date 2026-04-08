@@ -454,6 +454,17 @@ th {
   background: #ecfeff;
 }
 
+.refresh-banner {
+  border-color: rgba(100, 116, 139, 0.24);
+  background: #f8fafc;
+}
+
+.banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .loading-card {
   display: grid;
   place-items: center;
@@ -548,5 +559,11 @@ th {
     bottom: 0;
     left: 0;
     display: block;
+  }
+
+  .banner-actions {
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
   }
 }
