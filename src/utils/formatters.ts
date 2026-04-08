@@ -1,7 +1,8 @@
-export const currencyFormatter = new Intl.NumberFormat("ko-KR", {
+export const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "KRW",
-  maximumFractionDigits: 0,
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
 });
 
 export const numberFormatter = new Intl.NumberFormat("ko-KR", {
