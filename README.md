@@ -117,6 +117,33 @@ npm.cmd run dev
 npm run build
 ```
 
+### 4. Supabase 저장 왕복 검증
+
+Supabase 모드에서 실제 저장과 재조회, 원복까지 확인하려면:
+
+```bash
+npm run verify:supabase
+```
+
+## PWA 설치
+
+이 프로젝트는 PWA로 설치할 수 있도록 설정되어 있습니다.
+
+- iPhone
+  - Safari에서 앱 주소 접속
+  - 공유 버튼 선택
+  - `홈 화면에 추가` 선택
+- Android
+  - Chrome에서 앱 주소 접속
+  - `앱 설치` 또는 `홈 화면에 추가` 선택
+
+프로덕션 빌드 후 설치 여부를 확인하려면:
+
+```bash
+npm run build
+npm run preview
+```
+
 ## 데이터 저장 구조
 
 앱은 저장소 레이어를 인터페이스 기반으로 분리해 두었습니다.

@@ -4,6 +4,7 @@ import {
   getDataProvider,
   getResolvedDataProvider,
 } from "../config/dataSource";
+import { useRef } from "react";
 import { mockPortfolioData } from "../data/mockData";
 import { generateMockPriceUpdates } from "../services/priceService";
 import {
@@ -25,6 +26,9 @@ export function usePortfolioStore() {
   const requestedDataProvider = useMemo(() => getDataProvider(), []);
   const dataProvider = useMemo(() => getResolvedDataProvider(), []);
   const repository = useMemo(() => createPortfolioRepository(), []);
+  const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const latestWriteIdRef = useRef(0);
+  const pendingWriteCountRef = useRef(0);
   const [data, setData] = useState<PortfolioData>(mockPortfolioData);
   const [isReady, setIsReady] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -63,24 +67,51 @@ export function usePortfolioStore() {
 
   const summary = useMemo(() => calculateDashboardSummary(data), [data]);
 
-  const persist = (nextData: PortfolioData) => {
-    setData(nextData);
+  const enqueueWrite = (
+    task: () => Promise<void>,
+    fallbackMessage: string,
+    nextData?: PortfolioData,
+  ) => {
+    if (nextData) {
+      setData(nextData);
+    }
+
+    const writeId = latestWriteIdRef.current + 1;
+    latestWriteIdRef.current = writeId;
+    pendingWriteCountRef.current += 1;
     setIsSaving(true);
     setSaveError(null);
 
-    void repository
-      .save(nextData)
+    const queuedWrite = saveQueueRef.current
+      .catch((error) => {
+        console.error("[My Portfolio OS] 이전 저장 작업 실패:", error);
+      })
+      .then(task);
+
+    saveQueueRef.current = queuedWrite;
+
+    void queuedWrite
       .catch((error) => {
         console.error("[My Portfolio OS] 저장 실패:", error);
-        setSaveError(
-          error instanceof Error
-            ? error.message
-            : "데이터 저장 중 오류가 발생했습니다.",
-        );
+
+        if (writeId === latestWriteIdRef.current) {
+          setSaveError(error instanceof Error ? error.message : fallbackMessage);
+        }
       })
       .finally(() => {
-        setIsSaving(false);
+        pendingWriteCountRef.current -= 1;
+        if (pendingWriteCountRef.current === 0) {
+          setIsSaving(false);
+        }
       });
+  };
+
+  const persist = (nextData: PortfolioData) => {
+    enqueueWrite(
+      () => repository.save(nextData),
+      "데이터 저장 중 오류가 발생했습니다.",
+      nextData,
+    );
   };
 
   const addHolding = (payload: Omit<Holding, "id">) => {
@@ -191,14 +222,14 @@ export function usePortfolioStore() {
   };
 
   const resetAll = () => {
-    setSaveError(null);
-    void repository.clear().catch((error) => {
-      console.error("[My Portfolio OS] 초기화 실패:", error);
-      setSaveError(
-        error instanceof Error ? error.message : "초기화 중 오류가 발생했습니다.",
-      );
-    });
-    persist(mockPortfolioData);
+    enqueueWrite(
+      async () => {
+        await repository.clear();
+        await repository.save(mockPortfolioData);
+      },
+      "초기화 중 오류가 발생했습니다.",
+      mockPortfolioData,
+    );
   };
 
   return {
