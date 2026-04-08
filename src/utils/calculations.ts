@@ -1,4 +1,4 @@
-import {
+﻿import {
   AllocationTarget,
   AssetAllocation,
   DashboardSummary,
@@ -8,7 +8,7 @@ import {
   Transaction,
 } from "../types";
 
-const assetTypes = ["미국주식", "한국주식", "ETF", "코인", "현금", "예금"] as const;
+const assetTypes = ["US Stock", "KR Stock", "ETF", "Crypto", "Cash", "Deposit"] as const;
 
 export function calculateHoldingMetrics(holding: Holding): HoldingMetrics {
   const investedAmount = holding.averagePrice * holding.quantity;
@@ -57,7 +57,7 @@ export function calculateDashboardSummary(data: PortfolioData): DashboardSummary
   const totalProfit = totalValue - totalInvested;
   const totalReturnRate = totalInvested === 0 ? 0 : (totalProfit / totalInvested) * 100;
   const cashValue = metrics
-    .filter((item) => item.assetType === "현금" || item.assetType === "예금")
+    .filter((item) => item.assetType === "Cash" || item.assetType === "Deposit")
     .reduce((sum, item) => sum + item.marketValue, 0);
 
   return {
@@ -86,7 +86,7 @@ export function applyTransactionToHoldings(
 
   const holding = nextHoldings[index];
 
-  if (transaction.type === "매수") {
+  if (transaction.type === "Buy") {
     const currentCost = holding.averagePrice * holding.quantity;
     const nextQuantity = holding.quantity + transaction.quantity;
     const buyCost = transaction.price * transaction.quantity + transaction.fee;
@@ -99,10 +99,10 @@ export function applyTransactionToHoldings(
     };
   }
 
-  if (transaction.type === "매도") {
+  if (transaction.type === "Sell") {
     const nextQuantity = holding.quantity - transaction.quantity;
     if (nextQuantity < 0) {
-      throw new Error("매도 수량이 보유 수량보다 많습니다.");
+      throw new Error("Sell quantity exceeds current holdings.");
     }
 
     nextHoldings[index] = {
@@ -112,7 +112,7 @@ export function applyTransactionToHoldings(
     };
   }
 
-  if (transaction.type === "입금" || transaction.type === "배당") {
+  if (transaction.type === "Deposit" || transaction.type === "Dividend") {
     const nextCash = holding.currentPrice + transaction.price;
     nextHoldings[index] = {
       ...holding,
@@ -121,7 +121,7 @@ export function applyTransactionToHoldings(
     };
   }
 
-  if (transaction.type === "출금") {
+  if (transaction.type === "Withdraw") {
     const nextCash = Math.max(0, holding.currentPrice - transaction.price);
     nextHoldings[index] = {
       ...holding,
@@ -131,7 +131,7 @@ export function applyTransactionToHoldings(
   }
 
   return nextHoldings.filter(
-    (item) => item.quantity > 0 || item.assetType === "현금" || item.assetType === "예금",
+    (item) => item.quantity > 0 || item.assetType === "Cash" || item.assetType === "Deposit",
   );
 }
 
@@ -148,10 +148,10 @@ export function reverseTransactionFromHoldings(
 
   const holding = nextHoldings[index];
 
-  if (transaction.type === "매수") {
+  if (transaction.type === "Buy") {
     const previousQuantity = holding.quantity - transaction.quantity;
     if (previousQuantity < 0) {
-      throw new Error("매수 거래를 되돌릴 수 없습니다.");
+      throw new Error("Cannot reverse this buy transaction.");
     }
 
     const previousCost =
@@ -165,14 +165,14 @@ export function reverseTransactionFromHoldings(
     };
   }
 
-  if (transaction.type === "매도") {
+  if (transaction.type === "Sell") {
     nextHoldings[index] = {
       ...holding,
       quantity: holding.quantity + transaction.quantity,
     };
   }
 
-  if (transaction.type === "입금" || transaction.type === "배당") {
+  if (transaction.type === "Deposit" || transaction.type === "Dividend") {
     const nextCash = Math.max(0, holding.currentPrice - transaction.price);
     nextHoldings[index] = {
       ...holding,
@@ -181,7 +181,7 @@ export function reverseTransactionFromHoldings(
     };
   }
 
-  if (transaction.type === "출금") {
+  if (transaction.type === "Withdraw") {
     const nextCash = holding.currentPrice + transaction.price;
     nextHoldings[index] = {
       ...holding,
@@ -191,6 +191,6 @@ export function reverseTransactionFromHoldings(
   }
 
   return nextHoldings.filter(
-    (item) => item.quantity > 0 || item.assetType === "현금" || item.assetType === "예금",
+    (item) => item.quantity > 0 || item.assetType === "Cash" || item.assetType === "Deposit",
   );
 }

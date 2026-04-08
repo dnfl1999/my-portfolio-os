@@ -1,8 +1,8 @@
-import { Holding } from "../types";
+﻿import { Holding } from "../types";
 
 export function generateMockPriceUpdates(holdings: Holding[]): Holding[] {
   return holdings.map((holding, index) => {
-    if (holding.assetType === "현금" || holding.assetType === "예금") {
+    if (holding.assetType === "Cash" || holding.assetType === "Deposit") {
       return holding;
     }
 

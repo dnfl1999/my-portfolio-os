@@ -1,112 +1,112 @@
-{
+﻿{
   "holdings": [
     {
       "id": "holding-tlry",
       "name": "틸레이 브랜드",
       "ticker": "TLRY",
-      "assetType": "誘멸뎅二쇱떇",
+      "assetType": "US Stock",
       "quantity": 1500,
       "averagePrice": 6.535673,
       "currentPrice": 6.46,
       "targetPrice": 0,
       "stopLossPrice": 0,
-      "memo": "실제 보유 포트폴리오 기준 입력값"
+      "memo": "Actual portfolio entry"
     },
     {
       "id": "holding-bmnr",
       "name": "비트마인 이머션 테크놀로지스",
       "ticker": "BMNR",
-      "assetType": "誘멸뎅二쇱떇",
+      "assetType": "US Stock",
       "quantity": 450,
       "averagePrice": 19.49,
       "currentPrice": 20.17,
       "targetPrice": 0,
       "stopLossPrice": 0,
-      "memo": "실제 보유 포트폴리오 기준 입력값"
+      "memo": "Actual portfolio entry"
     },
     {
       "id": "holding-slrn",
       "name": "샐레타 테라퓨틱스",
       "ticker": "SLRN",
-      "assetType": "誘멸뎅二쇱떇",
+      "assetType": "US Stock",
       "quantity": 140,
       "averagePrice": 19.718,
       "currentPrice": 23.08,
       "targetPrice": 0,
       "stopLossPrice": 0,
-      "memo": "실제 보유 포트폴리오 기준 입력값"
+      "memo": "Actual portfolio entry"
     },
     {
       "id": "holding-pfe",
       "name": "화이자",
       "ticker": "PFE",
-      "assetType": "誘멸뎅二쇱떇",
+      "assetType": "US Stock",
       "quantity": 100,
       "averagePrice": 25.9,
       "currentPrice": 27.1,
       "targetPrice": 0,
       "stopLossPrice": 0,
-      "memo": "실제 보유 포트폴리오 기준 입력값"
+      "memo": "Actual portfolio entry"
     },
     {
       "id": "holding-nvts",
       "name": "나비타스 세미컨덕터",
       "ticker": "NVTS",
-      "assetType": "誘멸뎅二쇱떇",
+      "assetType": "US Stock",
       "quantity": 270,
       "averagePrice": 8.996296,
       "currentPrice": 8.57,
       "targetPrice": 0,
       "stopLossPrice": 0,
-      "memo": "실제 보유 포트폴리오 기준 입력값"
+      "memo": "Actual portfolio entry"
     },
     {
       "id": "holding-cep",
       "name": "캔터 에쿼티 파트너스 1",
       "ticker": "CEP",
-      "assetType": "誘멸뎅二쇱떇",
+      "assetType": "US Stock",
       "quantity": 200,
       "averagePrice": 14.91665,
       "currentPrice": 10.545,
       "targetPrice": 0,
       "stopLossPrice": 0,
-      "memo": "실제 보유 포트폴리오 기준 입력값"
+      "memo": "Actual portfolio entry"
     },
     {
       "id": "holding-absi",
       "name": "압사이",
       "ticker": "ABSI",
-      "assetType": "誘멸뎅二쇱떇",
+      "assetType": "US Stock",
       "quantity": 600,
       "averagePrice": 2.813333,
       "currentPrice": 2.92,
       "targetPrice": 0,
       "stopLossPrice": 0,
-      "memo": "실제 보유 포트폴리오 기준 입력값"
+      "memo": "Actual portfolio entry"
     },
     {
       "id": "holding-etp",
       "name": "ENTREPRENEUR PRIVATE PUB...",
       "ticker": "ETP",
-      "assetType": "誘멸뎅二쇱떇",
+      "assetType": "US Stock",
       "quantity": 14,
       "averagePrice": 16.99,
       "currentPrice": 17.04,
       "targetPrice": 0,
       "stopLossPrice": 0,
-      "memo": "종목명은 추후 직접 수정 가능"
+      "memo": "Name can be edited later"
     },
     {
       "id": "holding-kdly",
       "name": "카인들리 MD",
       "ticker": "KDLY",
-      "assetType": "誘멸뎅二쇱떇",
+      "assetType": "US Stock",
       "quantity": 1000,
       "averagePrice": 1.2099,
       "currentPrice": 0.2122,
       "targetPrice": 0,
       "stopLossPrice": 0,
-      "memo": "실제 보유 포트폴리오 기준 입력값"
+      "memo": "Actual portfolio entry"
     }
   ],
   "transactions": [],
@@ -114,7 +114,7 @@
     {
       "id": "note-tlry",
       "holdingId": "holding-tlry",
-      "title": "TLRY 투자노트",
+      "title": "TLRY note",
       "reasonToBuy": "",
       "addCondition": "",
       "sellCondition": "",
@@ -125,7 +125,7 @@
     {
       "id": "note-bmnr",
       "holdingId": "holding-bmnr",
-      "title": "BMNR 투자노트",
+      "title": "BMNR note",
       "reasonToBuy": "",
       "addCondition": "",
       "sellCondition": "",
@@ -136,7 +136,7 @@
     {
       "id": "note-slrn",
       "holdingId": "holding-slrn",
-      "title": "SLRN 투자노트",
+      "title": "SLRN note",
       "reasonToBuy": "",
       "addCondition": "",
       "sellCondition": "",
@@ -147,7 +147,7 @@
     {
       "id": "note-pfe",
       "holdingId": "holding-pfe",
-      "title": "PFE 투자노트",
+      "title": "PFE note",
       "reasonToBuy": "",
       "addCondition": "",
       "sellCondition": "",
@@ -158,7 +158,7 @@
     {
       "id": "note-nvts",
       "holdingId": "holding-nvts",
-      "title": "NVTS 투자노트",
+      "title": "NVTS note",
       "reasonToBuy": "",
       "addCondition": "",
       "sellCondition": "",
@@ -169,7 +169,7 @@
     {
       "id": "note-cep",
       "holdingId": "holding-cep",
-      "title": "CEP 투자노트",
+      "title": "CEP note",
       "reasonToBuy": "",
       "addCondition": "",
       "sellCondition": "",
@@ -180,7 +180,7 @@
     {
       "id": "note-absi",
       "holdingId": "holding-absi",
-      "title": "ABSI 투자노트",
+      "title": "ABSI note",
       "reasonToBuy": "",
       "addCondition": "",
       "sellCondition": "",
@@ -191,7 +191,7 @@
     {
       "id": "note-etp",
       "holdingId": "holding-etp",
-      "title": "ETP 투자노트",
+      "title": "ETP note",
       "reasonToBuy": "",
       "addCondition": "",
       "sellCondition": "",
@@ -202,7 +202,7 @@
     {
       "id": "note-kdly",
       "holdingId": "holding-kdly",
-      "title": "KDLY 투자노트",
+      "title": "KDLY note",
       "reasonToBuy": "",
       "addCondition": "",
       "sellCondition": "",
@@ -213,7 +213,7 @@
   ],
   "allocationTargets": [
     {
-      "assetType": "誘멸뎅二쇱떇",
+      "assetType": "US Stock",
       "targetRatio": 100
     }
   ]

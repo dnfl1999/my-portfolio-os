@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+﻿import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -38,7 +38,8 @@ function requireEnv(value, key) {
 
 function loadPayload() {
   const payloadPath = resolve(process.cwd(), "scripts", "portfolio-default-payload.json");
-  return JSON.parse(readFileSync(payloadPath, "utf8"));
+  const source = readFileSync(payloadPath, "utf8").replace(/^\uFEFF/, "");
+  return JSON.parse(source);
 }
 
 function summarize(payload) {

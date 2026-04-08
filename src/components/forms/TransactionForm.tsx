@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Holding, Transaction, TransactionType } from "../../types";
 
-const transactionTypes: TransactionType[] = ["매수", "매도", "입금", "출금", "배당"];
+const transactionTypes: TransactionType[] = ["Buy", "Sell", "Deposit", "Withdraw", "Dividend"];
 
 interface TransactionFormProps {
   holdings: Holding[];
@@ -10,7 +10,7 @@ interface TransactionFormProps {
 
 export function TransactionForm({ holdings, onSubmit }: TransactionFormProps) {
   const [form, setForm] = useState<Omit<Transaction, "id">>({
-    type: "매수",
+    type: "Buy",
     date: new Date().toISOString().slice(0, 10),
     holdingId: holdings[0]?.id ?? null,
     name: holdings[0]?.name ?? "",
@@ -98,7 +98,7 @@ export function TransactionForm({ holdings, onSubmit }: TransactionFormProps) {
       </label>
       <label className="full-span">
         메모
-        <input value={form.memo} onChange={(e) => setForm((prev) => ({ ...prev, memo: e.target.value }))} placeholder="빠르게 기록할 메모" />
+        <input value={form.memo} onChange={(e) => setForm((prev) => ({ ...prev, memo: e.target.value }))} placeholder="간단한 메모" />
       </label>
       <div className="form-actions full-span">
         <button type="submit" className="button primary" disabled={holdings.length === 0}>

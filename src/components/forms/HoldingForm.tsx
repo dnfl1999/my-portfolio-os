@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { AssetType, Holding } from "../../types";
 
-const assetTypes: AssetType[] = ["미국주식", "한국주식", "ETF", "코인", "현금", "예금"];
+const assetTypes: AssetType[] = ["US Stock", "KR Stock", "ETF", "Crypto", "Cash", "Deposit"];
 
 const emptyForm: Omit<Holding, "id"> = {
   name: "",
   ticker: "",
-  assetType: "미국주식",
+  assetType: "US Stock",
   quantity: 0,
   averagePrice: 0,
   currentPrice: 0,

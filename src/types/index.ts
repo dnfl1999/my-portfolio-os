@@ -1,12 +1,12 @@
-export type AssetType =
-  | "미국주식"
-  | "한국주식"
+﻿export type AssetType =
+  | "US Stock"
+  | "KR Stock"
   | "ETF"
-  | "코인"
-  | "현금"
-  | "예금";
+  | "Crypto"
+  | "Cash"
+  | "Deposit";
 
-export type TransactionType = "매수" | "매도" | "입금" | "출금" | "배당";
+export type TransactionType = "Buy" | "Sell" | "Deposit" | "Withdraw" | "Dividend";
 
 export type PageKey =
   | "dashboard"
