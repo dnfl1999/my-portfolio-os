@@ -449,6 +449,11 @@ th {
   background: #eff6ff;
 }
 
+.update-banner {
+  border-color: rgba(15, 118, 110, 0.24);
+  background: #ecfeff;
+}
+
 .loading-card {
   display: grid;
   place-items: center;

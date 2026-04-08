@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { AppShell } from "./components/layout/AppShell";
 import { MobileTabs } from "./components/layout/MobileTabs";
 import { Sidebar } from "./components/layout/Sidebar";
@@ -20,7 +20,24 @@ const pageTitles: Record<PageKey, string> = {
 
 function App() {
   const [activePage, setActivePage] = useState<PageKey>("dashboard");
+  const [applyUpdate, setApplyUpdate] = useState<(() => void) | null>(null);
   const store = usePortfolioStore();
+
+  useEffect(() => {
+    const handleUpdateReady = (
+      event: CustomEvent<{
+        applyUpdate: () => void;
+      }>,
+    ) => {
+      setApplyUpdate(() => event.detail.applyUpdate);
+    };
+
+    window.addEventListener("pwa-update-ready", handleUpdateReady as EventListener);
+
+    return () => {
+      window.removeEventListener("pwa-update-ready", handleUpdateReady as EventListener);
+    };
+  }, []);
 
   const renderPage = () => {
     switch (activePage) {
@@ -46,6 +63,22 @@ function App() {
       title={pageTitles[activePage]}
       subtitle="엑셀을 대체하는 개인 투자 대시보드"
     >
+      {applyUpdate && (
+        <div className="status-banner update-banner">
+          <div>
+            <strong>새 버전이 준비되었습니다</strong>
+            <p>홈 화면 앱에서도 바로 최신 버전으로 갱신할 수 있습니다.</p>
+          </div>
+          <button
+            className="button primary small"
+            onClick={() => applyUpdate()}
+            type="button"
+          >
+            지금 업데이트
+          </button>
+        </div>
+      )}
+
       {store.saveError && (
         <div className="status-banner error-banner" role="alert">
           <div>
