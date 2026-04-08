@@ -1,4 +1,4 @@
-import { mockPortfolioData } from "../data/mockData";
+import { emptyPortfolioData } from "../data/mockData";
 import { PortfolioData } from "../types";
 import { PersistedPortfolioData } from "../types/storage";
 import { PortfolioRepository } from "./portfolioRepository";
@@ -9,18 +9,18 @@ const STORAGE_VERSION = 1;
 export class LocalPortfolioRepository implements PortfolioRepository {
   async load(): Promise<PortfolioData> {
     if (typeof window === "undefined") {
-      return mockPortfolioData;
+      return emptyPortfolioData;
     }
 
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return mockPortfolioData;
+      return emptyPortfolioData;
     }
 
     try {
       const parsed = JSON.parse(raw) as PersistedPortfolioData;
       if (parsed.version !== STORAGE_VERSION) {
-        return mockPortfolioData;
+        return emptyPortfolioData;
       }
 
       return {
@@ -30,7 +30,7 @@ export class LocalPortfolioRepository implements PortfolioRepository {
         allocationTargets: parsed.allocationTargets,
       };
     } catch {
-      return mockPortfolioData;
+      return emptyPortfolioData;
     }
   }
 

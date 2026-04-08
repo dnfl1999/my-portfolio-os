@@ -5,7 +5,7 @@ import {
   getResolvedDataProvider,
 } from "../config/dataSource";
 import { useRef } from "react";
-import { mockPortfolioData } from "../data/mockData";
+import { emptyPortfolioData } from "../data/mockData";
 import { generateMockPriceUpdates } from "../services/priceService";
 import {
   AllocationTarget,
@@ -29,7 +29,7 @@ export function usePortfolioStore() {
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
   const latestWriteIdRef = useRef(0);
   const pendingWriteCountRef = useRef(0);
-  const [data, setData] = useState<PortfolioData>(mockPortfolioData);
+  const [data, setData] = useState<PortfolioData>(emptyPortfolioData);
   const [isReady, setIsReady] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -225,10 +225,10 @@ export function usePortfolioStore() {
     enqueueWrite(
       async () => {
         await repository.clear();
-        await repository.save(mockPortfolioData);
+        await repository.save(emptyPortfolioData);
       },
       "초기화 중 오류가 발생했습니다.",
-      mockPortfolioData,
+      emptyPortfolioData,
     );
   };
 

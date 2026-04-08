@@ -80,7 +80,7 @@ export function SettingsPage({ store }: SettingsPageProps) {
 
       <Card
         title="데이터 관리"
-        description="로컬 저장 데이터를 내보내기, 가져오기, 초기화할 수 있습니다."
+        description="저장 데이터를 내보내기, 가져오기, 빈 포트폴리오 상태로 초기화할 수 있습니다."
       >
         <div className="settings-actions">
           <button className="button primary" onClick={store.exportData} type="button">
@@ -93,7 +93,7 @@ export function SettingsPage({ store }: SettingsPageProps) {
           <button
             className="button danger"
             onClick={() => {
-              if (window.confirm("모든 데이터를 샘플 데이터 상태로 초기화할까요?")) {
+              if (window.confirm("모든 데이터를 삭제하고 빈 포트폴리오 상태로 초기화할까요?")) {
                 store.resetAll();
               }
             }}

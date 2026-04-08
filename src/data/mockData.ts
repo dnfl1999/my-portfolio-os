@@ -1,6 +1,13 @@
 import { PortfolioData } from "../types";
 
-export const mockPortfolioData: PortfolioData = {
+export const emptyPortfolioData: PortfolioData = {
+  holdings: [],
+  transactions: [],
+  notes: [],
+  allocationTargets: [],
+};
+
+export const samplePortfolioData: PortfolioData = {
   holdings: [
     {
       id: "holding-aapl",
@@ -141,3 +148,5 @@ export const mockPortfolioData: PortfolioData = {
     { assetType: "예금", targetRatio: 5 },
   ],
 };
+
+export const mockPortfolioData: PortfolioData = emptyPortfolioData;
