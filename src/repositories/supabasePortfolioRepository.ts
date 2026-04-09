@@ -1,6 +1,7 @@
 ﻿import { mockPortfolioData } from "../data/mockData";
 import { getSupabaseClient, isSupabaseConfigured } from "../integrations/supabase/client";
 import { PortfolioData } from "../types";
+import { normalizePortfolioData } from "../utils/portfolioData";
 import { PortfolioRepository } from "./portfolioRepository";
 
 const TABLE_NAME = "portfolio_snapshots";
@@ -31,7 +32,7 @@ export class SupabasePortfolioRepository implements PortfolioRepository {
       throw new Error(`Supabase 데이터 로드에 실패했습니다: ${error.message}`);
     }
 
-    return data?.payload ?? mockPortfolioData;
+    return normalizePortfolioData(data?.payload ?? mockPortfolioData);
   }
 
   async save(data: PortfolioData): Promise<void> {

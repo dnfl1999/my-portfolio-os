@@ -1,10 +1,11 @@
 import { emptyPortfolioData } from "../data/mockData";
 import { PortfolioData } from "../types";
 import { PersistedPortfolioData } from "../types/storage";
+import { normalizePortfolioData } from "../utils/portfolioData";
 import { PortfolioRepository } from "./portfolioRepository";
 
 const STORAGE_KEY = "my-portfolio-os";
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 
 export class LocalPortfolioRepository implements PortfolioRepository {
   async load(): Promise<PortfolioData> {
@@ -19,16 +20,11 @@ export class LocalPortfolioRepository implements PortfolioRepository {
 
     try {
       const parsed = JSON.parse(raw) as PersistedPortfolioData;
-      if (parsed.version !== STORAGE_VERSION) {
+      if (parsed.version > STORAGE_VERSION) {
         return emptyPortfolioData;
       }
 
-      return {
-        holdings: parsed.holdings,
-        transactions: parsed.transactions,
-        notes: parsed.notes,
-        allocationTargets: parsed.allocationTargets,
-      };
+      return normalizePortfolioData(parsed);
     } catch {
       return emptyPortfolioData;
     }

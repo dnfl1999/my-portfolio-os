@@ -7,11 +7,12 @@ import {
 import { useRef } from "react";
 import { emptyPortfolioData } from "../data/mockData";
 import { getSupabaseClient, isSupabaseConfigured } from "../integrations/supabase/client";
-import { generateMockPriceUpdates } from "../services/priceService";
+import { MarketPriceQuote } from "../services/marketDataService";
 import {
   AllocationTarget,
   Holding,
   InvestmentNote,
+  LivePriceSettings,
   PortfolioData,
   Transaction,
 } from "../types";
@@ -246,11 +247,77 @@ export function usePortfolioStore() {
     persist({ ...data, allocationTargets });
   };
 
-  const refreshMockPrices = () => {
+  const updateLivePriceSettings = (settings: Partial<LivePriceSettings>) => {
     persist({
       ...data,
-      holdings: generateMockPriceUpdates(data.holdings),
+      marketData: {
+        ...data.marketData,
+        settings: {
+          ...data.marketData.settings,
+          ...settings,
+        },
+      },
     });
+  };
+
+  const markLivePriceRefreshAttempt = () => {
+    setData((current) => ({
+      ...current,
+      marketData: {
+        ...current.marketData,
+        lastAttemptAt: new Date().toISOString(),
+        lastError: null,
+      },
+    }));
+  };
+
+  const setLivePriceError = (message: string) => {
+    setData((current) => ({
+      ...current,
+      marketData: {
+        ...current.marketData,
+        lastAttemptAt: new Date().toISOString(),
+        lastError: message,
+      },
+    }));
+  };
+
+  const applyLivePriceSnapshot = (quotes: MarketPriceQuote[]) => {
+    const timestamp = new Date().toISOString();
+    const quoteMap = new Map(quotes.map((quote) => [quote.ticker.toUpperCase(), quote]));
+
+    const nextData = {
+      ...data,
+      holdings: data.holdings.map((holding) => {
+        const quote = quoteMap.get(holding.ticker.trim().toUpperCase());
+
+        if (!quote) {
+          return holding;
+        }
+
+        return {
+          ...holding,
+          currentPrice: quote.price,
+        };
+      }),
+      marketData: {
+        ...data.marketData,
+        lastAttemptAt: timestamp,
+        lastUpdatedAt: quotes.length > 0 ? timestamp : data.marketData.lastUpdatedAt,
+        lastError: null,
+        priceCache: {
+          ...data.marketData.priceCache,
+          ...Object.fromEntries(quotes.map((quote) => [quote.ticker, quote])),
+        },
+      },
+    };
+
+    if (nextData.marketData.settings.persistPriceCache) {
+      persist(nextData);
+      return;
+    }
+
+    setData(nextData);
   };
 
   const handleExport = () => exportPortfolioData(data);
@@ -287,7 +354,10 @@ export function usePortfolioStore() {
     saveNote,
     deleteNote,
     updateAllocationTarget,
-    refreshMockPrices,
+    updateLivePriceSettings,
+    markLivePriceRefreshAttempt,
+    setLivePriceError,
+    applyLivePriceSnapshot,
     exportData: handleExport,
     importData: handleImport,
     resetAll,

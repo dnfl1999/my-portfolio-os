@@ -33,3 +33,18 @@ export function formatDate(value: string) {
     day: "numeric",
   }).format(new Date(value));
 }
+
+export function formatDateTime(value: string | null) {
+  if (!value) {
+    return "아직 없음";
+  }
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  }).format(new Date(value));
+}

@@ -1,4 +1,5 @@
 import { PortfolioData } from "../types";
+import { normalizePortfolioData } from "./portfolioData";
 
 export function exportPortfolioData(data: PortfolioData) {
   const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -18,7 +19,7 @@ export function importPortfolioData(file: File): Promise<PortfolioData> {
     reader.onload = () => {
       try {
         const parsed = JSON.parse(String(reader.result)) as PortfolioData;
-        resolve(parsed);
+        resolve(normalizePortfolioData(parsed));
       } catch (error) {
         reject(error);
       }

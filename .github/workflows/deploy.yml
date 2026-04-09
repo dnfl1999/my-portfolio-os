@@ -40,6 +40,8 @@ jobs:
           VITE_APP_DATA_PROVIDER: supabase
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_MARKET_DATA_PROVIDER: api
+          VITE_MARKET_DATA_API_BASE_URL: https://my-portfolio-os-api.vercel.app
         run: npm run build
 
       - name: Upload Pages Artifact

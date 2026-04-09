@@ -2,6 +2,7 @@
 import { AppShell } from "./components/layout/AppShell";
 import { MobileTabs } from "./components/layout/MobileTabs";
 import { Sidebar } from "./components/layout/Sidebar";
+import { useLivePrices } from "./hooks/useLivePrices";
 import { usePortfolioStore } from "./hooks/usePortfolioStore";
 import { DashboardPage } from "./pages/DashboardPage";
 import { HoldingsPage } from "./pages/HoldingsPage";
@@ -24,6 +25,7 @@ function App() {
   const [refreshApp, setRefreshApp] = useState<(() => Promise<void>) | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const store = usePortfolioStore();
+  const livePrices = useLivePrices({ store });
 
   useEffect(() => {
     const handleUpdateReady = (
@@ -67,9 +69,9 @@ function App() {
   const renderPage = () => {
     switch (activePage) {
       case "dashboard":
-        return <DashboardPage store={store} onNavigate={setActivePage} />;
+        return <DashboardPage store={store} livePrices={livePrices} onNavigate={setActivePage} />;
       case "holdings":
-        return <HoldingsPage store={store} />;
+        return <HoldingsPage store={store} livePrices={livePrices} />;
       case "transactions":
         return <TransactionsPage store={store} />;
       case "notes":

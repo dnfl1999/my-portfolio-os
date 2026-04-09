@@ -1,4 +1,5 @@
 import { AllocationBarList } from "../components/charts/AllocationBarList";
+import { LastUpdatedBadge } from "../components/LastUpdatedBadge";
 import { DonutChart } from "../components/charts/DonutChart";
 import { Card } from "../components/common/Card";
 import { MetricCard } from "../components/common/MetricCard";
@@ -10,10 +11,11 @@ import { formatCurrency, formatDate, formatPercent } from "../utils/formatters";
 
 interface DashboardPageProps {
   store: ReturnType<typeof import("../hooks/usePortfolioStore").usePortfolioStore>;
+  livePrices: ReturnType<typeof import("../hooks/useLivePrices").useLivePrices>;
   onNavigate: (page: PageKey) => void;
 }
 
-export function DashboardPage({ store, onNavigate }: DashboardPageProps) {
+export function DashboardPage({ store, livePrices, onNavigate }: DashboardPageProps) {
   const metrics = store.data.holdings.map(calculateHoldingMetrics);
   const topItems = [...metrics].sort((a, b) => b.marketValue - a.marketValue).slice(0, 5);
   const { sortedItems } = useSortableData(topItems, "marketValue");
@@ -21,6 +23,27 @@ export function DashboardPage({ store, onNavigate }: DashboardPageProps) {
   return (
     <div className="page-grid">
       <SectionTitle title="포트폴리오 요약" description="핵심 숫자를 한 화면에서 빠르게 확인합니다." />
+      <div className="live-price-toolbar">
+        <LastUpdatedBadge
+          value={livePrices.lastUpdatedAt}
+          tone={livePrices.lastError ? "error" : "default"}
+        />
+        <div className="banner-actions">
+          {livePrices.lastError && (
+            <span className="inline-error">{livePrices.lastError}</span>
+          )}
+          <button
+            className="button ghost small"
+            disabled={!livePrices.hasQuotedHoldings || livePrices.isRefreshing}
+            onClick={() => {
+              void livePrices.refreshNow();
+            }}
+            type="button"
+          >
+            {livePrices.isRefreshing ? "현재가 확인 중..." : "현재가 다시 조회"}
+          </button>
+        </div>
+      </div>
       <div className="metrics-grid">
         <MetricCard label="총 투자원금" value={formatCurrency(store.summary.totalInvested)} />
         <MetricCard label="총 평가금액" value={formatCurrency(store.summary.totalValue)} />

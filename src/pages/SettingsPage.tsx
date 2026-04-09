@@ -79,6 +79,53 @@ export function SettingsPage({ store }: SettingsPageProps) {
       </Card>
 
       <Card
+        title="실시간 가격 갱신"
+        description="서버 경유 가격 API 호출 여부와 자동갱신 간격을 관리합니다."
+      >
+        <div className="settings-summary">
+          <div className="summary-row">
+            <strong>자동 갱신</strong>
+            <label className="toggle-row">
+              <input
+                checked={store.data.marketData.settings.enabled}
+                onChange={(event) =>
+                  store.updateLivePriceSettings({ enabled: event.target.checked })
+                }
+                type="checkbox"
+              />
+              <span>{store.data.marketData.settings.enabled ? "ON" : "OFF"}</span>
+            </label>
+          </div>
+          <label className="target-row">
+            <div>
+              <strong>자동갱신 간격</strong>
+              <p>15초, 30초, 60초 중 하나를 선택합니다.</p>
+            </div>
+            <select
+              value={store.data.marketData.settings.intervalSeconds}
+              onChange={(event) =>
+                store.updateLivePriceSettings({
+                  intervalSeconds: Number(event.target.value) as 15 | 30 | 60,
+                })
+              }
+            >
+              <option value={15}>15초</option>
+              <option value={30}>30초</option>
+              <option value={60}>60초</option>
+            </select>
+          </label>
+          <div className="summary-row">
+            <strong>가격 provider</strong>
+            <span>{store.data.marketData.settings.provider}</span>
+          </div>
+          <div className="summary-row">
+            <strong>가격 캐시 저장</strong>
+            <span>{store.data.marketData.settings.persistPriceCache ? "사용" : "미사용"}</span>
+          </div>
+        </div>
+      </Card>
+
+      <Card
         title="데이터 관리"
         description="저장 데이터를 내보내기, 가져오기, 빈 포트폴리오 상태로 초기화할 수 있습니다."
       >

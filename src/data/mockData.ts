@@ -1,10 +1,13 @@
 ﻿import { PortfolioData } from "../types";
 
+import { createDefaultMarketDataState } from "../utils/portfolioData";
+
 export const emptyPortfolioData: PortfolioData = {
   holdings: [],
   transactions: [],
   notes: [],
   allocationTargets: [],
+  marketData: createDefaultMarketDataState(),
 };
 
 export const samplePortfolioData: PortfolioData = {
@@ -103,6 +106,7 @@ export const samplePortfolioData: PortfolioData = {
     { assetType: "Cash", targetRatio: 20 },
     { assetType: "Deposit", targetRatio: 5 },
   ],
+  marketData: createDefaultMarketDataState(),
 };
 
 export const mockPortfolioData: PortfolioData = emptyPortfolioData;

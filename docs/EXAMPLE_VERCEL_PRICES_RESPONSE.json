@@ -1,0 +1,22 @@
+{
+  "prices": [
+    {
+      "ticker": "TLRY",
+      "price": 1.82,
+      "updatedAt": "2026-04-09T09:00:00.000Z",
+      "currency": "USD"
+    },
+    {
+      "ticker": "PFE",
+      "price": 27.46,
+      "updatedAt": "2026-04-09T09:00:00.000Z",
+      "currency": "USD"
+    },
+    {
+      "ticker": "NVTS",
+      "price": 3.11,
+      "updatedAt": "2026-04-09T09:00:00.000Z",
+      "currency": "USD"
+    }
+  ]
+}

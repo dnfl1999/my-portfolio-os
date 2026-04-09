@@ -33,8 +33,9 @@
   - JSON 내보내기 / 가져오기
   - 전체 초기화
 - 가격 서비스 분리
-  - 현재는 더미 현재가 업데이트 버튼 제공
-  - 이후 외부 현재가 API 연결 가능
+  - mock provider / API provider 분리
+  - 15초 / 30초 / 60초 자동 갱신
+  - 마지막 업데이트 시각 / 오류 / 재시도 표시
 
 ## 기술 스택
 
@@ -164,6 +165,8 @@ npm run preview
 VITE_APP_DATA_PROVIDER=local
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+VITE_MARKET_DATA_PROVIDER=mock
+VITE_MARKET_DATA_API_BASE_URL=
 ```
 
 ### 데이터 소스 선택
@@ -174,6 +177,25 @@ VITE_SUPABASE_ANON_KEY=
 - `VITE_APP_DATA_PROVIDER=supabase`
   - Supabase 저장소 사용 시도
   - 환경 변수가 없으면 자동으로 localStorage로 fallback
+
+### 현재가 provider 선택
+
+- `VITE_MARKET_DATA_PROVIDER=mock`
+  - 기본값
+  - 외부 API 없이 가짜 시세로 자동 갱신 흐름을 검증
+- `VITE_MARKET_DATA_PROVIDER=api`
+  - 프론트는 `/api/prices`만 호출
+  - 실제 비밀키는 서버리스 또는 별도 백엔드에서만 사용
+- `VITE_MARKET_DATA_API_BASE_URL=https://your-serverless-host`
+  - GitHub Pages처럼 정적 호스팅일 때 API 서버의 베이스 URL 지정
+  - 비워두면 same-origin `/api/prices` 호출
+
+예시:
+
+```bash
+VITE_MARKET_DATA_PROVIDER=api
+VITE_MARKET_DATA_API_BASE_URL=https://my-portfolio-os-prices.vercel.app
+```
 
 ## Supabase 연결 방법
 
@@ -242,15 +264,133 @@ Supabase 모드에서는 `portfolio_snapshots`의 `default` 행 변경을 구독
 
 - `src/utils/calculations.ts`
 
-## 현재가 서비스 확장
+## 실시간 가격 반영
 
-현재는 외부 API 없이 동작하며, 더미 현재가 업데이트 버튼으로 수동 테스트가 가능합니다.
+현재가는 `mock` / `api` provider 인터페이스로 분리되어 있습니다.
 
-향후 확장 포인트:
+- 서비스 레이어: `src/services/marketDataService.ts`
+- 자동 갱신 훅: `src/hooks/useLivePrices.ts`
+- 마지막 업데이트 표시: `src/components/LastUpdatedBadge.tsx`
+- 서버리스 예시: `api/prices.ts`
 
-- `src/services/priceService.ts`
+동작 방식:
 
-여기에 Yahoo Finance, Twelve Data, Finnhub, Polygon 같은 API 연동 로직을 추가하면 됩니다.
+- 보유 종목에서 `Cash`, `Deposit`을 제외한 티커만 추출
+- 기본 30초마다 `/api/prices` 일괄 호출
+- 응답 받은 현재가를 holdings에 반영
+- 평가금액, 총손익, 수익률, 자산 비중을 즉시 재계산
+- 마지막 업데이트 시각과 오류 상태를 UI에 표시
+
+### GitHub Pages에서 실제 가격 API 쓰기
+
+GitHub Pages는 정적 호스팅이므로 비밀키를 안전하게 보관할 서버 코드가 없습니다.
+그래서 운영 환경에서는 아래처럼 분리해야 합니다.
+
+1. GitHub Pages에는 프론트만 배포
+2. 별도 서버리스 또는 백엔드에 `/api/prices` 구현
+3. 서버에서 외부 가격 API 키를 사용
+4. 프론트는 `VITE_MARKET_DATA_API_BASE_URL`을 통해 그 서버의 `/api/prices`를 호출
+
+`api/prices.ts`는 Vercel 서버리스 함수 기준으로 정리되어 있고, 실제 upstream API 키는 환경 변수로만 읽습니다.
+
+### Vercel 서버리스 배포 절차
+
+1. 이 저장소를 Vercel에 import
+2. 프로젝트 Root는 저장소 루트 그대로 사용
+3. `api/prices.ts`를 함수 엔드포인트로 배포
+4. 필요하면 프론트 정적 출력은 무시하고 API 용도로만 사용
+5. Vercel 프로젝트 Settings -> Environment Variables에 아래 값 입력
+6. 배포 완료 후 엔드포인트 URL 확보
+7. GitHub Pages 프론트의 `VITE_MARKET_DATA_API_BASE_URL`에 그 URL 입력
+
+이 저장소에는 [`vercel.json`](./vercel.json) 이 포함되어 있고, `api/*.ts` 함수에 `maxDuration` 설정을 적용합니다.
+
+### Vercel 환경 변수
+
+필수:
+
+- `PRICE_UPSTREAM_URL`
+  - 외부 시세 공급자 base URL
+- `PRICE_API_KEY`
+  - 외부 시세 API 키
+
+선택:
+
+- `PRICE_UPSTREAM_PATH`
+  - 기본값 `/quotes`
+- `PRICE_UPSTREAM_SYMBOLS_PARAM`
+  - 기본값 `symbols`
+- `PRICE_API_KEY_HEADER`
+  - 기본값 `Authorization`
+- `PRICE_API_KEY_PREFIX`
+  - 기본값 `Bearer`
+- `MARKET_DATA_ALLOWED_ORIGIN`
+  - 기본값 `*`
+  - 운영 시에는 `https://dnfl1999.github.io` 또는 실제 GitHub Pages origin으로 제한 권장
+- `PRICE_PROVIDER_MODE`
+  - `example`로 두면 외부 API 없이 예시 응답 반환
+
+### Upstream 응답 매핑
+
+Vercel 함수는 [`api/_lib/marketDataMapper.ts`](./api/_lib/marketDataMapper.ts) 에서 외부 공급자 응답을 앱 포맷으로 변환합니다.
+
+현재 자동 매핑 가능한 대표 필드:
+
+- 티커: `ticker`, `symbol`, `code`
+- 가격: `price`, `last`, `close`, `regularMarketPrice`, `lastPrice`
+- 시각: `updatedAt`, `lastUpdatedAt`, `timestamp`, `time`, `regularMarketTime`
+- 통화: `currency`
+
+즉 아래처럼 들어와도 앱 응답으로 바뀝니다.
+
+```json
+{
+  "quotes": [
+    { "symbol": "TLRY", "regularMarketPrice": 1.82, "currency": "USD" },
+    { "symbol": "PFE", "regularMarketPrice": 27.46, "currency": "USD" },
+    { "symbol": "NVTS", "regularMarketPrice": 3.11, "currency": "USD" }
+  ]
+}
+```
+
+변환 후 앱 응답 예시는 [`docs/EXAMPLE_VERCEL_PRICES_RESPONSE.json`](./docs/EXAMPLE_VERCEL_PRICES_RESPONSE.json) 에 들어 있습니다.
+
+### 테스트 방법
+
+1. Vercel에서 `PRICE_PROVIDER_MODE=example` 설정
+2. 배포 후 아래 요청 실행
+
+```bash
+curl -X POST "https://your-vercel-project.vercel.app/api/prices" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"tickers\":[\"TLRY\",\"PFE\",\"NVTS\"]}"
+```
+
+3. 응답에 `TLRY`, `PFE`, `NVTS` 가격이 들어오는지 확인
+4. 그다음 `PRICE_PROVIDER_MODE`를 제거하고 실제 `PRICE_UPSTREAM_URL`, `PRICE_API_KEY`를 넣어 재배포
+5. 프론트 `.env`에서 `VITE_MARKET_DATA_PROVIDER=api` 와 `VITE_MARKET_DATA_API_BASE_URL` 설정
+6. 앱 설정 페이지에서 자동 갱신 ON 상태로 확인
+
+### 프론트에서 `api` provider 사용하기
+
+```bash
+VITE_MARKET_DATA_PROVIDER=api
+VITE_MARKET_DATA_API_BASE_URL=https://your-vercel-project.vercel.app
+```
+
+이후 프론트는 `POST https://your-vercel-project.vercel.app/api/prices` 만 호출합니다.
+
+### Supabase 가격 캐시 확장
+
+현재 포트폴리오 payload에는 `marketData` 필드가 포함됩니다.
+
+- `settings`
+- `lastUpdatedAt`
+- `lastAttemptAt`
+- `lastError`
+- `priceCache`
+
+이 구조 덕분에 나중에 `persistPriceCache`를 켜거나, Supabase에서 마지막 가격 캐시를 별도 처리하는 방향으로 확장할 수 있습니다.
 
 ## 향후 추천 확장
 

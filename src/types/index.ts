@@ -15,6 +15,9 @@ export type PageKey =
   | "notes"
   | "settings";
 
+export type MarketDataProvider = "mock" | "api";
+export type LivePriceInterval = 15 | 30 | 60;
+
 export interface Holding {
   id: string;
   name: string;
@@ -57,11 +60,35 @@ export interface AllocationTarget {
   targetRatio: number;
 }
 
+export interface LivePriceSettings {
+  enabled: boolean;
+  intervalSeconds: LivePriceInterval;
+  provider: MarketDataProvider;
+  persistPriceCache: boolean;
+}
+
+export interface LivePriceCacheEntry {
+  ticker: string;
+  price: number;
+  updatedAt: string;
+  source: MarketDataProvider;
+  currency: string;
+}
+
+export interface MarketDataState {
+  settings: LivePriceSettings;
+  lastUpdatedAt: string | null;
+  lastAttemptAt: string | null;
+  lastError: string | null;
+  priceCache: Record<string, LivePriceCacheEntry>;
+}
+
 export interface PortfolioData {
   holdings: Holding[];
   transactions: Transaction[];
   notes: InvestmentNote[];
   allocationTargets: AllocationTarget[];
+  marketData: MarketDataState;
 }
 
 export interface HoldingMetrics extends Holding {

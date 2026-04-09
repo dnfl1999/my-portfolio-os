@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Card } from "../components/common/Card";
 import { EmptyState } from "../components/common/EmptyState";
+import { LastUpdatedBadge } from "../components/LastUpdatedBadge";
 import { SortableHeader } from "../components/common/SortableHeader";
 import { HoldingForm } from "../components/forms/HoldingForm";
 import { useSortableData } from "../hooks/useSortableData";
@@ -10,9 +11,10 @@ import { formatCurrency, formatNumber, formatPercent } from "../utils/formatters
 
 interface HoldingsPageProps {
   store: ReturnType<typeof import("../hooks/usePortfolioStore").usePortfolioStore>;
+  livePrices: ReturnType<typeof import("../hooks/useLivePrices").useLivePrices>;
 }
 
-export function HoldingsPage({ store }: HoldingsPageProps) {
+export function HoldingsPage({ store, livePrices }: HoldingsPageProps) {
   const [editing, setEditing] = useState<Holding | null>(null);
   const metrics = useMemo(
     () => store.data.holdings.map(calculateHoldingMetrics),
@@ -26,11 +28,38 @@ export function HoldingsPage({ store }: HoldingsPageProps) {
         title={editing ? "보유 종목 수정" : "보유 종목 추가"}
         description="수동 입력 기반으로 현재 포지션을 빠르게 등록합니다."
         action={
-          <button className="button secondary" onClick={store.refreshMockPrices} type="button">
-            더미 현재가 업데이트
+          <button
+            className="button secondary"
+            disabled={!livePrices.hasQuotedHoldings || livePrices.isRefreshing}
+            onClick={() => {
+              void livePrices.refreshNow();
+            }}
+            type="button"
+          >
+            {livePrices.isRefreshing ? "조회 중..." : "현재가 갱신"}
           </button>
         }
       >
+        <div className="holding-toolbar">
+          <LastUpdatedBadge
+            value={livePrices.lastUpdatedAt}
+            tone={livePrices.lastError ? "error" : "default"}
+          />
+          {livePrices.lastError && (
+            <div className="status-inline error">
+              <span>{livePrices.lastError}</span>
+              <button
+                className="button ghost small"
+                onClick={() => {
+                  void livePrices.refreshNow();
+                }}
+                type="button"
+              >
+                재시도
+              </button>
+            </div>
+          )}
+        </div>
         <HoldingForm
           initialValue={editing}
           onSubmit={(value) => {
