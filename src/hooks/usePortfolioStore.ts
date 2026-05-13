@@ -5,7 +5,7 @@ import {
   getResolvedDataProvider,
 } from "../config/dataSource";
 import { useRef } from "react";
-import { emptyPortfolioData } from "../data/mockData";
+import { emptyPortfolioData, mockPortfolioData } from "../data/mockData";
 import { getSupabaseClient, isSupabaseConfigured } from "../integrations/supabase/client";
 import { MarketPriceQuote } from "../services/marketDataService";
 import {
@@ -32,6 +32,7 @@ export function usePortfolioStore() {
   const latestWriteIdRef = useRef(0);
   const pendingWriteCountRef = useRef(0);
   const [data, setData] = useState<PortfolioData>(emptyPortfolioData);
+  const latestDataRef = useRef<PortfolioData>(emptyPortfolioData);
   const [isReady, setIsReady] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -47,13 +48,14 @@ export function usePortfolioStore() {
         }
 
         setData(loaded);
+        latestDataRef.current = loaded;
       })
       .catch((error) => {
         console.error("[My Portfolio OS] 저장소 로드 실패:", error);
         if (mounted) {
-          setSaveError(
-            error instanceof Error ? error.message : "데이터를 불러오지 못했습니다.",
-          );
+          setData(mockPortfolioData);
+          latestDataRef.current = mockPortfolioData;
+          setSaveError(null);
         }
       })
       .finally(() => {
@@ -87,6 +89,7 @@ export function usePortfolioStore() {
           try {
             const latest = await repository.load();
             setData(latest);
+            latestDataRef.current = latest;
             setSaveError(null);
           } catch (error) {
             console.error("[My Portfolio OS] 실시간 동기화 실패:", error);
@@ -114,6 +117,7 @@ export function usePortfolioStore() {
   ) => {
     if (nextData) {
       setData(nextData);
+      latestDataRef.current = nextData;
     }
 
     const writeId = latestWriteIdRef.current + 1;
@@ -261,34 +265,43 @@ export function usePortfolioStore() {
   };
 
   const markLivePriceRefreshAttempt = () => {
-    setData((current) => ({
-      ...current,
-      marketData: {
-        ...current.marketData,
-        lastAttemptAt: new Date().toISOString(),
-        lastError: null,
-      },
-    }));
+    setData((current) => {
+      const nextData = {
+        ...current,
+        marketData: {
+          ...current.marketData,
+          lastAttemptAt: new Date().toISOString(),
+          lastError: null,
+        },
+      };
+      latestDataRef.current = nextData;
+      return nextData;
+    });
   };
 
   const setLivePriceError = (message: string) => {
-    setData((current) => ({
-      ...current,
-      marketData: {
-        ...current.marketData,
-        lastAttemptAt: new Date().toISOString(),
-        lastError: message,
-      },
-    }));
+    setData((current) => {
+      const nextData = {
+        ...current,
+        marketData: {
+          ...current.marketData,
+          lastAttemptAt: new Date().toISOString(),
+          lastError: message,
+        },
+      };
+      latestDataRef.current = nextData;
+      return nextData;
+    });
   };
 
   const applyLivePriceSnapshot = (quotes: MarketPriceQuote[]) => {
     const timestamp = new Date().toISOString();
     const quoteMap = new Map(quotes.map((quote) => [quote.ticker.toUpperCase(), quote]));
+    const currentData = latestDataRef.current;
 
     const nextData = {
-      ...data,
-      holdings: data.holdings.map((holding) => {
+      ...currentData,
+      holdings: currentData.holdings.map((holding) => {
         const quote = quoteMap.get(holding.ticker.trim().toUpperCase());
 
         if (!quote) {
@@ -301,12 +314,12 @@ export function usePortfolioStore() {
         };
       }),
       marketData: {
-        ...data.marketData,
+        ...currentData.marketData,
         lastAttemptAt: timestamp,
-        lastUpdatedAt: quotes.length > 0 ? timestamp : data.marketData.lastUpdatedAt,
+        lastUpdatedAt: quotes.length > 0 ? timestamp : currentData.marketData.lastUpdatedAt,
         lastError: null,
         priceCache: {
-          ...data.marketData.priceCache,
+          ...currentData.marketData.priceCache,
           ...Object.fromEntries(quotes.map((quote) => [quote.ticker, quote])),
         },
       },
@@ -317,6 +330,7 @@ export function usePortfolioStore() {
       return;
     }
 
+    latestDataRef.current = nextData;
     setData(nextData);
   };
 

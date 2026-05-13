@@ -1,6 +1,10 @@
 ﻿import { PortfolioData } from "../types";
 
+import defaultPortfolioPayload from "../../scripts/portfolio-default-payload.json";
 import { createDefaultMarketDataState } from "../utils/portfolioData";
+
+const defaultPortfolioData = defaultPortfolioPayload as Omit<PortfolioData, "marketData"> &
+  Partial<Pick<PortfolioData, "marketData">>;
 
 export const emptyPortfolioData: PortfolioData = {
   holdings: [],
@@ -109,4 +113,10 @@ export const samplePortfolioData: PortfolioData = {
   marketData: createDefaultMarketDataState(),
 };
 
-export const mockPortfolioData: PortfolioData = emptyPortfolioData;
+export const mockPortfolioData: PortfolioData = {
+  holdings: defaultPortfolioData.holdings,
+  transactions: defaultPortfolioData.transactions,
+  notes: defaultPortfolioData.notes,
+  allocationTargets: defaultPortfolioData.allocationTargets,
+  marketData: createDefaultMarketDataState(),
+};

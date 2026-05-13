@@ -12,13 +12,25 @@ export function useLivePrices({ store }: UseLivePricesOptions) {
   const intervalSeconds = store.data.marketData.settings.intervalSeconds;
   const autoRefreshEnabled = store.data.marketData.settings.enabled;
   const provider = store.data.marketData.settings.provider;
+  const latestHoldingsRef = useRef(store.data.holdings);
+  const latestProviderRef = useRef(provider);
+
+  useEffect(() => {
+    latestHoldingsRef.current = store.data.holdings;
+  }, [store.data.holdings]);
+
+  useEffect(() => {
+    latestProviderRef.current = provider;
+  }, [provider]);
 
   const refreshNow = async () => {
-    if (isRefreshing || tickers.length === 0) {
+    const currentHoldings = latestHoldingsRef.current;
+    const currentTickers = getQuotedTickers(currentHoldings);
+
+    if (inFlightRef.current || currentTickers.length === 0) {
       return;
     }
 
-    inFlightRef.current?.abort();
     const controller = new AbortController();
     inFlightRef.current = controller;
     setIsRefreshing(true);
@@ -26,8 +38,8 @@ export function useLivePrices({ store }: UseLivePricesOptions) {
 
     try {
       const quotes = await fetchMarketPrices({
-        holdings: store.data.holdings,
-        provider,
+        holdings: currentHoldings,
+        provider: latestProviderRef.current,
         signal: controller.signal,
       });
 
